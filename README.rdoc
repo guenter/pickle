@@ -3,7 +3,7 @@
 Pickle gives you cucumber steps that create your models easily from factory-girl or
 machinist factories/blueprints.  You can also just use ActiveRecord but it's not as cool.
 
-References to the models are stored, not necessarily for the purpose of checking the db
+References to the models are stored in the current world, not necessarily for the purpose of checking the db
 (although you could use it for that), but for enabling easy reference to urls, and for
 building complex givens which require a bunch of models collaborating
 
@@ -15,15 +15,23 @@ It's tested against all stable branches of 2.x rails, and edge, with the latest 
 
 Install pickle either as a rails plugin, or a gem
 
+  # gem from gemcutter
+  sudo gem install pickle
+
   # plugin
   script/plugin install git://github.com/ianwhite/pickle.git
   
   # or, plugin as submodule
   git submodule add git://github.com/ianwhite/pickle.git vendor/plugins/pickle
 
-  # or, gem
-  sudo gem install ianwhite-pickle
-  
+== Contributors
+
+The following people have Pickle better:
+
+* {Nick Rutherford}[http://github.com/nruth]
+* Tobi Knaup
+* {Michael MacDonald}[http://github.com/schlick]
+
 == Get Started
 
 (you'd better install cucumber)
@@ -106,11 +114,11 @@ You can refer to other models in the fields
   And a person: "ethel" exists
   And a fatherhood exists with parent: user "fred", child: user "ethel"
   
-"Given <b>n</b> models exist", e.g.
+"Given <b>n models</b> exist", e.g.
   
   Given 10 users exist
   
-"Given <b>n</b> <b>models</b> exist with <b>fields</b>", examples:
+"Given <b>n models</b> exist with <b>fields</b>", examples:
 
   Given 10 users exist with activated: false
 
@@ -132,11 +140,11 @@ You can use other models, booleans, numerics, and strings as fields
   Then a user should exist with activated: false
   Then a user should exist with activated: true, email: "fred@gmail.com"
   
-"Then <b>n</b> <b>models</b> should exist", e.g.
+"Then <b>n models</b> should exist", e.g.
 
   Then 10 events should exist
   
-"Then <b>n</b> <b>models</b> should exist with <b>fields</b>", e.g.
+"Then <b>n models</b> should exist with <b>fields</b>", e.g.
 
   Then 2 people should exist with father: person "fred"
   
@@ -158,7 +166,7 @@ Many-to-one assocs: "Then <b>a model</b> should be [in|one of] <b>other model</b
   Then the user should have a status # => user.status?.should == true
   Then the car: "batmobile" should be fast # => car.fast?.should == true
   
-"Then <b>a model</b> should [be|have] [a|an] <b>predicate</b>", e.g.
+"Then <b>a model</b> should not [be|have] [a|an] <b>predicate</b>", e.g.
 
   Then person: "fred" should not be childless # => fred.childless?.should == false
   
@@ -185,7 +193,9 @@ Pickle::Parser::Matchers for the methods available)
   end
 
   Then /^#{capture_model} should be one of #{capture_model}'s posts$/ do |post, forum|
-    model(forum).posts.should include(post)
+    post = model!(post)
+    forum = model!(forum)
+    forum.posts.should include(post)
   end 
 
 *capture_fields*
