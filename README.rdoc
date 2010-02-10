@@ -7,9 +7,21 @@ References to the models are stored in the current world, not necessarily for th
 (although you could use it for that), but for enabling easy reference to urls, and for
 building complex givens which require a bunch of models collaborating
 
-== CI
+== Resources
 
-It's tested against all stable branches of 2.x rails, and edge, with the latest versions of rspec, cucumber, factory_girl, machinist.
+<b>Github</b> for code: http://github.com/ianwhite/pickle
+
+<b>Gemcutter</b> for the gem: http://gemcutter.org/gems/pickle
+
+<b>API</b> docs: http://ianwhite.github.com/pickle/doc
+
+<b>Google group</b> for questions: http://groups.google.com/group/pickle-cucumber
+
+<b>Lighthouse</b> for bugs: http://ianwhite.lighthouseapp.com/projects/25941-pickle
+
+<b>Railscast</b> presentation: http://railscasts.com/episodes/186-pickle-with-cucumber
+
+<b>Blog articles</b>: {dynamic50: Integration testing with cucumber and pickle}[http://blog.dynamic50.com/index.php/2009/04/integration-testing-with-cucumber-and-pickle/], {rubyflare: pickle my cucumber}[http://rubyflare.com/2009/10/28/pickle-my-cucumber/]
 
 == Install
 
@@ -18,15 +30,22 @@ Install pickle either as a rails plugin, or a gem
   # gem from gemcutter
   sudo gem install pickle
 
+  # gem dependency (in config/environments/cucumber.rb)
+  config.gem 'pickle'
+
   # plugin
   script/plugin install git://github.com/ianwhite/pickle.git
   
   # or, plugin as submodule
   git submodule add git://github.com/ianwhite/pickle.git vendor/plugins/pickle
 
+== CI
+
+It's tested against all stable branches of 2.x rails, and edge, with the latest versions of rspec, cucumber, factory_girl, machinist.
+
 == Contributors
 
-The following people have Pickle better:
+The following people have made Pickle better:
 
 * {Nick Rutherford}[http://github.com/nruth]
 * Tobi Knaup
@@ -73,11 +92,22 @@ In your <tt>features/support/env.rb</tt> add the following lines at the bottom
   require "#{Rails.root}/spec/blueprints" # or wherever they live
   Before { Sham.reset } # reset Shams in between scenarios
 
+==== FactoryGirl: make sure factories are loaded
+
+In your config/environments/cucumber.rb file, make sure the factory-girl gem is included (unless it's installed as a plugin).
+
+If that doesn't solve loading issues then require your factories.rb file directly in a file called 'features/support/factory_girl.rb'
+
+  # example features/support/factory_girl.rb
+  require File.dirname(__FILE__) + '/../../spec/factories'
+
 === Configuring Pickle
 
 You can tell pickle to use another factory adapter (see Pickle::Adapter), or
 create mappings from english expressions to pickle model names.  You can also
-override many of the options on the Pickle::Config object if you so choose 
+override many of the options on the Pickle::Config object if you so choose.
+
+In: <tt>features/support/pickle.rb</tt>
 
   require 'pickle/world'
 
@@ -85,6 +115,10 @@ override many of the options on the Pickle::Config object if you so choose
     config.adapters = [:machinist, YourOwnAdapterClass]
     config.map 'me', 'myself', 'my', 'I', :to => 'user: "me"'
   end
+  
+Out of the box pickle looks for machinist, then factory-girl, then finally active-record 'factories'.
+If you find that your steps aren't working with your factories, it's probably the case that your factory
+setup is not being included in your cucumber environment (see comments above regarding machinist and factory-girl).
 
 == API
 
